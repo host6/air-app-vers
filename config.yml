@@ -2,11 +2,3 @@ apps:
   - name: pos
     environments:
       - live
-      - dev
-      - test
-  - name: backoffice
-    environments:
-      - live
-      - dev
-      - test
-
