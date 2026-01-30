@@ -1,0 +1,72 @@
+name: Validate Version Manifest
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'manifests/*.yml'
+      - 'config.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install pyyaml
+
+      - name: Validate manifests
+        id: validate
+        run: |
+          python scripts/validate.py
+        continue-on-error: true
+
+      - name: Comment PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let comment = '';
+            
+            if (${{ steps.validate.outcome == 'success' }}) {
+              comment = 'Validation passed\n\nAll manifest files are valid.';
+            } else {
+              comment = 'Validation failed\n\nPlease check the workflow logs for details.';
+            }
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Fail if validation failed
+        if: steps.validate.outcome != 'success'
+        run: exit 1
+
+  auto-merge:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: success()
+    steps:
+      - name: Auto-merge PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              merge_method: 'squash'
+            });
+

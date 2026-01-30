@@ -1,0 +1,28 @@
+versions:
+  "1.0.0":
+    released_at: 2026-01-10T09:00:00Z
+    notes: Mandatory update due to critical issues.
+    matchers:
+      - matcher_type: default
+        severity: red
+  "1.1.0":
+    released_at: 2026-01-15T14:20:00Z
+    notes: Recommended update with important fixes.
+    matchers:
+      - matcher_type: country
+        matcher_value: GB
+        severity: red
+      - matcher_type: default
+        severity: yellow
+  "2.0.0":
+    released_at: 2026-01-22T10:30:00Z
+    matchers:
+      - matcher_type: location_hash
+        matcher_value: 5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9
+        severity: red
+      - matcher_type: country
+        matcher_value: US
+        severity: yellow
+      - matcher_type: default
+        severity: green
+

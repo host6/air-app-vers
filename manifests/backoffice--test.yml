@@ -1,0 +1,13 @@
+versions:
+  "1.7.0":
+    released_at: 2026-01-29T09:00:00Z
+    matchers:
+      - matcher_type: default
+        severity: green
+  "1.8.0":
+    released_at: 2026-01-30T11:00:00Z
+    notes: Test release for QA testing.
+    matchers:
+      - matcher_type: default
+        severity: green
+

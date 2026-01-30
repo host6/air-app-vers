@@ -1,0 +1,17 @@
+versions:
+  "1.5.0":
+    released_at: 2026-01-20T12:00:00Z
+    notes: Performance improvements and bug fixes.
+    matchers:
+      - matcher_type: default
+        severity: yellow
+  "1.6.0":
+    released_at: 2026-01-25T14:30:00Z
+    notes: New reporting features and UI enhancements.
+    matchers:
+      - matcher_type: country
+        matcher_value: DE
+        severity: yellow
+      - matcher_type: default
+        severity: green
+
