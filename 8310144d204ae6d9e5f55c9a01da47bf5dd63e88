@@ -1,3 +1,5 @@
 [AIR-2822] in-app-version-control: run github workflow on modifications under scripts/ path
 
 https://untill.atlassian.net/browse/AIR-2822
+
+{"version":"1.0","github_issue_url":"","jira_ticket_url":"https://untill.atlassian.net/browse/AIR-2822","branch_type":2}
