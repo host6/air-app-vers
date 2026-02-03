@@ -4,11 +4,6 @@ on:
   pull_request:
     branches:
       - main
-    paths:
-      - 'manifests/*.yml'
-      - 'config.yml'
-      - 'scripts/**'
-      - 'github/workflows/**'
 
 jobs:
   check-author:
