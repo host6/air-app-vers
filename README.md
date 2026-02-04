@@ -16,9 +16,8 @@ coverage run -m unittest discover scripts
 coverage html
 ```
 
-## Try example
+## Manual validate
 
 ```bash
-cd scripts/test_example
-./run.sh
+./validate.sh
 ```
