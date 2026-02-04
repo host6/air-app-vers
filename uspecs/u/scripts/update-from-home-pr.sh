@@ -97,6 +97,12 @@ git checkout -b "$BRANCH_NAME"
 echo "Running update-from-home.sh..."
 bash "$SCRIPT_DIR/update-from-home.sh" "$PWD/uspecs/u"
 
+# Read version info for commit/PR messages
+VERSION_INFO=""
+if [[ -f "$PWD/uspecs/version.txt" ]]; then
+    VERSION_INFO=$(cat "$PWD/uspecs/version.txt")
+fi
+
 # Check if there are any changes to commit
 if [[ -z $(git status --porcelain) ]]; then
     echo "No changes to commit. Cleaning up..."
@@ -109,7 +115,7 @@ fi
 # Commit changes
 echo "Committing changes..."
 git add -A
-git commit -m "Update uspecs from USPECS_HOME (${TIMESTAMP_POSTFIX})"
+git commit -m "Update uspecs to ${VERSION_INFO}"
 
 # Push to origin
 echo "Pushing branch to origin..."
@@ -118,13 +124,22 @@ git push -u origin "$BRANCH_NAME"
 # Create PR using GitHub CLI
 echo "Creating pull request to $PR_REMOTE..."
 PR_REPO="$(git remote get-url "$PR_REMOTE" | sed -E 's#.*github.com[:/]##; s#\.git$##')"
+PR_BODY="Update uspecs/u from USPECS_HOME
+
+Version: ${VERSION_INFO}"
 
 if [[ "$PR_REMOTE" == "upstream" ]]; then
     # PR from fork to upstream
     ORIGIN_OWNER="$(git remote get-url origin | sed -E 's#.*github.com[:/]##; s#\.git$##; s#/.*##')"
-    gh pr create --repo "$PR_REPO" --base main --head "${ORIGIN_OWNER}:${BRANCH_NAME}" --title "Update uspecs from USPECS_HOME (${TIMESTAMP_POSTFIX})" --body "Automated update uspecs from USPECS_HOME (${TIMESTAMP_POSTFIX})"
+    gh pr create --repo "$PR_REPO" --base main --head "${ORIGIN_OWNER}:${BRANCH_NAME}" --title "Update uspecs to ${VERSION_INFO}" --body "$PR_BODY"
 else
     # PR within same repo (origin)
-    gh pr create --repo "$PR_REPO" --base main --head "$BRANCH_NAME" --title "Update uspecs from USPECS_HOME (${TIMESTAMP_POSTFIX})" --body "Automated update uspecs from USPECS_HOME (${TIMESTAMP_POSTFIX})"
+    gh pr create --repo "$PR_REPO" --base main --head "$BRANCH_NAME" --title "Update uspecs to ${VERSION_INFO}" --body "$PR_BODY"
 fi
 echo "Pull request created successfully!"
+
+# Clean up local branch (remote branch remains for PR)
+echo "Cleaning up local branch..."
+git checkout main
+git branch -d "$BRANCH_NAME"
+echo "Done!"
