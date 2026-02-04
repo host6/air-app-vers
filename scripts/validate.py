@@ -225,6 +225,21 @@ def main():
     """Validate all manifest files against config.yml."""
     manifests_dir = Path('manifests')
 
+    # Print config.yml content
+    print("=" * 60)
+    print("config.yml content:")
+    print("=" * 60)
+    try:
+        with open('config.yml', 'r') as f:
+            config_content = f.read()
+            print(config_content)
+    except FileNotFoundError:
+        print("config.yml not found")
+    except Exception as e:
+        print(f"Error reading config.yml: {e}")
+    print("=" * 60)
+    print()
+
     # Load and validate config.yml
     config, config_error = load_config()
     if config_error:
