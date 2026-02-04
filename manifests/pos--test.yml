@@ -1,28 +1,64 @@
 versions:
-  "1.0.0":
-    released_at: 2026-01-10T09:00:00Z
-    notes: Mandatory update due to critical issues.
+  "2.0.0":
+    released_at: 2026-01-22T10:30:00Z
+    notes:
+      en: |
+        ## Major update with new features
+
+        This version includes:
+        - New dashboard interface
+        - Enhanced reporting capabilities
+        - Improved performance
+
+        **Optional update - users can update at their convenience.**
+      nl: |
+        ## Grote update met nieuwe functies
+
+        Deze versie bevat:
+        - Nieuwe dashboard-interface
+        - Verbeterde rapportagemogelijkheden
+        - Verbeterde prestaties
+
+        **Optionele update - gebruikers kunnen updaten wanneer het hen uitkomt.**
+      de: |
+        ## Großes Update mit neuen Funktionen
+
+        Diese Version enthält:
+        - Neue Dashboard-Oberfläche
+        - Verbesserte Berichtsfunktionen
+        - Verbesserte Leistung
+
+        **Optionales Update - Benutzer können nach Belieben aktualisieren.**
     matchers:
       - matcher_type: default
+        severity: green
+      - matcher_type: country
+        matcher_value: NL
+        severity: yellow
+      - matcher_type: location_hash
+        matcher_value: 9b6835f566cbbd84a554fbf0bd508893e68afc283c2367322d9d02b4c97868fa
         severity: red
   "1.1.0":
     released_at: 2026-01-15T14:20:00Z
-    notes: Recommended update with important fixes.
+    notes:
+      en: Recommended update with important fixes.
+      nl: Aanbevolen update met belangrijke fixes.
+      de: Empfohlenes Update mit wichtigen Korrekturen.
     matchers:
-      - matcher_type: country
-        matcher_value: GB
-        severity: red
-      - matcher_type: default
-        severity: yellow
-  "2.0.0":
-    released_at: 2026-01-22T10:30:00Z
-    matchers:
-      - matcher_type: location_hash
-        matcher_value: 5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9
-        severity: red
-      - matcher_type: country
-        matcher_value: US
-        severity: yellow
       - matcher_type: default
         severity: green
-
+      - matcher_type: country
+        matcher_value: NL
+        severity: yellow
+      - matcher_type: country
+        matcher_value: DE
+        severity: red
+  "1.0.0":
+    released_at: 2026-01-10T09:00:00Z
+    notes:
+      en: Mandatory update due to critical issues.
+      nl: Verplichte update vanwege kritieke problemen.
+      de: Pflichtupdate aufgrund kritischer Probleme.
+    matchers:
+      - matcher_type: default
+        severity: red
