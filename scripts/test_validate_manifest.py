@@ -506,6 +506,23 @@ class TestValidateManifest(unittest.TestCase):
         self.assertTrue(len(errors) > 0)
         self.assertTrue(any("Error reading file" in err for err in errors))
 
+    def test_utf8_encoded_manifest(self):
+        """Test manifest with UTF-8 characters is validated correctly."""
+        filepath = os.path.join(self.temp_dir, "test.yml")
+        content = """versions:
+  "1.0.0":
+    released_at: 2026-01-10T09:00:00Z
+    notes: "Versión con caracteres especiales: äöü ñ 日本語"
+    matchers:
+      - matcher_type: default
+        severity: green
+"""
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        errors = validate_manifest(filepath)
+        self.assertEqual(errors, [])
+
 
 if __name__ == '__main__':
     unittest.main()

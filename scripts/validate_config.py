@@ -34,7 +34,7 @@ def validate_name(name):
 def load_config(config_path='config.yml'):
     """Load and parse config.yml file."""
     try:
-        with open(config_path, 'r') as f:
+        with open(config_path, 'r', encoding='utf-8') as f:
             return yaml.safe_load(f), None
     except yaml.YAMLError as e:
         return None, f"YAML syntax error in config.yml: {e}"
@@ -77,6 +77,11 @@ def validate_config(config):
             errors.append(f"config.yml: invalid app name '{app_name}' (must be lowercase letters only)")
             continue
 
+        # Check for duplicate app names
+        if app_name in app_names:
+            errors.append(f"config.yml: duplicate app name '{app_name}'")
+            continue
+
         app_names.add(app_name)
 
         # Validate environments
@@ -89,10 +94,16 @@ def validate_config(config):
             errors.append(f"config.yml: app '{app_name}' environments must be a non-empty list")
             continue
 
+        seen_envs = set()
         for env in envs:
             if not validate_name(env):
                 errors.append(f"config.yml: invalid environment '{env}' in app '{app_name}' (must be lowercase letters only)")
                 continue
+            # Check for duplicate environment names within same app
+            if env in seen_envs:
+                errors.append(f"config.yml: duplicate environment '{env}' in app '{app_name}'")
+                continue
+            seen_envs.add(env)
             expected_files.add(f"{app_name}--{env}.yml")
 
     # Validate locales
@@ -107,7 +118,11 @@ def validate_config(config):
                 if not isinstance(locale, str) or not locale:
                     errors.append(f"config.yml: invalid locale '{locale}' (must be a non-empty string)")
                 else:
-                    locales.add(locale)
+                    # Check for duplicate locale names
+                    if locale in locales:
+                        errors.append(f"config.yml: duplicate locale '{locale}'")
+                    else:
+                        locales.add(locale)
 
             # Check that required locale is present
             if REQUIRED_LOCALE not in locales:

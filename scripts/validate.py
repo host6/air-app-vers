@@ -34,14 +34,14 @@ def get_versions_from_manifests(manifests_dir):
         app_name = filename.split('--')[0]
 
         try:
-            with open(manifest_file, 'r') as f:
+            with open(manifest_file, 'r', encoding='utf-8') as f:
                 data = yaml.safe_load(f)
             if data and 'versions' in data and isinstance(data['versions'], dict):
                 if app_name not in app_versions:
                     app_versions[app_name] = set()
                 app_versions[app_name].update(data['versions'].keys())
-        except Exception:
-            continue
+        except Exception as e:
+            raise RuntimeError(f"Error reading manifest file {manifest_file}: {e}") from e
 
     return app_versions
 

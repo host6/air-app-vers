@@ -65,7 +65,7 @@ def validate_manifest(filepath):
     errors = []
 
     try:
-        with open(filepath, 'r') as f:
+        with open(filepath, 'r', encoding='utf-8') as f:
             data = yaml.safe_load(f)
     except yaml.YAMLError as e:
         return [f"YAML syntax error: {e}"]

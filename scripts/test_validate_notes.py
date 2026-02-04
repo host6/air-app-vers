@@ -62,7 +62,7 @@ class TestValidateNotesFile(unittest.TestCase):
     def write_notes(self, content):
         """Helper to write a notes file."""
         filepath = os.path.join(self.temp_dir, "test--1.0.0.yml")
-        with open(filepath, 'w') as f:
+        with open(filepath, 'w', encoding='utf-8') as f:
             f.write(content)
         return Path(filepath)
 
@@ -213,6 +213,16 @@ class TestValidateNotesFile(unittest.TestCase):
         filepath = self.write_notes(content)
         errors = validate_notes_file(filepath, {'en-en'})
         self.assertTrue(any("'notes' must be a string" in e for e in errors))
+
+    def test_utf8_encoded_notes(self):
+        """Test notes file with UTF-8 characters is validated correctly."""
+        content = """locales:
+  - name: en-en
+    notes: "Release notes with special characters: äöü ñ 日本語 émojis 🎉"
+"""
+        filepath = self.write_notes(content)
+        errors = validate_notes_file(filepath, {'en-en'})
+        self.assertEqual(errors, [])
 
 
 if __name__ == '__main__':

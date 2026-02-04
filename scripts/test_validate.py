@@ -10,8 +10,9 @@ import shutil
 from datetime import datetime
 from io import StringIO
 from unittest.mock import patch
+from pathlib import Path
 
-from scripts.validate import main
+from scripts.validate import main, get_versions_from_manifests
 from scripts.validate_config import (
     validate_name,
     load_config,
@@ -232,6 +233,38 @@ class TestValidateConfig(unittest.TestCase):
         }
         expected_files, app_names, locales, errors = validate_config(config)
         self.assertTrue(any("invalid locale" in e for e in errors))
+
+    def test_duplicate_app_names(self):
+        """Test error when duplicate app names exist."""
+        config = {
+            'apps': [
+                {'name': 'pos', 'environments': ['live']},
+                {'name': 'pos', 'environments': ['staging']}
+            ],
+            'locales': ['en-en']
+        }
+        expected_files, app_names, locales, errors = validate_config(config)
+        self.assertTrue(any("duplicate app name 'pos'" in e for e in errors))
+
+    def test_duplicate_environment_names(self):
+        """Test error when duplicate environment names exist within same app."""
+        config = {
+            'apps': [
+                {'name': 'pos', 'environments': ['live', 'staging', 'live']}
+            ],
+            'locales': ['en-en']
+        }
+        expected_files, app_names, locales, errors = validate_config(config)
+        self.assertTrue(any("duplicate environment 'live' in app 'pos'" in e for e in errors))
+
+    def test_duplicate_locale_names(self):
+        """Test error when duplicate locale names exist."""
+        config = {
+            'apps': [{'name': 'pos', 'environments': ['live']}],
+            'locales': ['en-en', 'nl-NL', 'en-en']
+        }
+        expected_files, app_names, locales, errors = validate_config(config)
+        self.assertTrue(any("duplicate locale 'en-en'" in e for e in errors))
 
 
 class TestParseSemver(unittest.TestCase):
@@ -747,6 +780,36 @@ locales:
         exit_code, output = self.run_main()
         self.assertEqual(exit_code, 1)
         self.assertIn("invalid environment 'LIVE'", output)
+
+
+class TestGetVersionsFromManifests(unittest.TestCase):
+    """Test get_versions_from_manifests function."""
+
+    def setUp(self):
+        """Create temporary directory with manifests subdirectory."""
+        self.temp_dir = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, self.temp_dir)
+        self.manifests_dir = os.path.join(self.temp_dir, 'manifests')
+        os.makedirs(self.manifests_dir)
+
+    def write_manifest(self, filename, content):
+        """Helper to write a manifest file."""
+        filepath = os.path.join(self.manifests_dir, filename)
+        with open(filepath, 'w', encoding='utf-8') as f:
+            f.write(content)
+        return filepath
+
+    def test_file_read_error_raises_exception(self):
+        """Test that file read errors are not suppressed."""
+        # Create a manifest file that will cause a read error
+        manifest_path = os.path.join(self.manifests_dir, 'pos--live.yml')
+        os.makedirs(manifest_path)  # Create directory instead of file to cause error
+
+        with self.assertRaises(RuntimeError) as cm:
+            get_versions_from_manifests(Path(self.manifests_dir))
+
+        self.assertIn("Error reading manifest file", str(cm.exception))
+
 
 if __name__ == '__main__':
     unittest.main()
