@@ -523,6 +523,127 @@ class TestValidateManifest(unittest.TestCase):
         errors = validate_manifest(filepath)
         self.assertEqual(errors, [])
 
+    def test_released_at_dates_are_in_chronological_order(self):
+        """Test error when released_at dates are not in chronological order."""
+        content = """
+            versions:
+              "1.0.0":
+                released_at: 2026-01-15T09:00:00Z
+                matchers:
+                  - matcher_type: default
+                    severity: green
+              "2.0.0":
+                released_at: 2026-01-10T09:00:00Z
+                matchers:
+                  - matcher_type: default
+                    severity: green
+        """
+        filepath = self.write_manifest(content)
+        errors = validate_manifest(filepath)
+        self.assertTrue(any("not in chronological order" in err for err in errors))
+
+    def test_released_at_is_not_in_the_future(self):
+        """Test error when released_at is in the future."""
+        content = """
+            versions:
+              "1.0.0":
+                released_at: 2099-01-10T09:00:00Z
+                matchers:
+                  - matcher_type: default
+                    severity: green
+        """
+        filepath = self.write_manifest(content)
+        errors = validate_manifest(filepath)
+        self.assertTrue(any("in the future" in err for err in errors))
+
+    def test_released_at_not_older_than_12_months(self):
+        """Test error when released_at is older than 12 months."""
+        content = """
+            versions:
+              "1.0.0":
+                released_at: 2020-01-10T09:00:00Z
+                matchers:
+                  - matcher_type: default
+                    severity: green
+        """
+        filepath = self.write_manifest(content)
+        errors = validate_manifest(filepath)
+        self.assertTrue(any("older than 12 months" in err for err in errors))
+
+    def test_no_duplicate_matchers_for_same_version(self):
+        """Test error when duplicate matchers exist for same version."""
+        content = """
+            versions:
+              "1.0.0":
+                released_at: 2026-01-10T09:00:00Z
+                matchers:
+                  - matcher_type: default
+                    severity: green
+                  - matcher_type: default
+                    severity: yellow
+        """
+        filepath = self.write_manifest(content)
+        errors = validate_manifest(filepath)
+        self.assertTrue(any("duplicate default matchers" in err for err in errors))
+
+    def test_no_conflicting_location_hash_matchers(self):
+        """Test error when conflicting location hash matchers exist."""
+        valid_hash = "5feceb66ffc86f38d952786c6d696c79c2dbc239dd4e91b46729d73a27fb57e9"
+        content = f"""
+            versions:
+              "1.0.0":
+                released_at: 2026-01-10T09:00:00Z
+                matchers:
+                  - matcher_type: location_hash
+                    matcher_value: {valid_hash}
+                    severity: green
+                  - matcher_type: location_hash
+                    matcher_value: {valid_hash}
+                    severity: red
+                  - matcher_type: default
+                    severity: green
+        """
+        filepath = self.write_manifest(content)
+        errors = validate_manifest(filepath)
+        self.assertTrue(any("conflicting location hash matchers" in err for err in errors))
+
+    def test_no_conflicting_country_matchers(self):
+        """Test error when conflicting country matchers exist."""
+        content = """
+            versions:
+              "1.0.0":
+                released_at: 2026-01-10T09:00:00Z
+                matchers:
+                  - matcher_type: country
+                    matcher_value: US
+                    severity: green
+                  - matcher_type: country
+                    matcher_value: US
+                    severity: red
+                  - matcher_type: default
+                    severity: green
+        """
+        filepath = self.write_manifest(content)
+        errors = validate_manifest(filepath)
+        self.assertTrue(any("conflicting country matchers" in err for err in errors))
+
+    def test_no_extra_fields(self):
+        """Test error when extra fields are present in version or matcher."""
+        content = """
+            versions:
+              "1.0.0":
+                released_at: 2026-01-10T09:00:00Z
+                extra_field: should not be here
+                matchers:
+                  - matcher_type: default
+                    severity: green
+                    unknown_field: invalid
+        """
+        filepath = self.write_manifest(content)
+        errors = validate_manifest(filepath)
+        self.assertTrue(any("extra fields not allowed" in err and "extra_field" in err for err in errors))
+        self.assertTrue(any("extra fields not allowed" in err and "unknown_field" in err for err in errors))
+
 
 if __name__ == '__main__':
     unittest.main()
