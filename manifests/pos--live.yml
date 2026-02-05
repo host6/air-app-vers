@@ -12,7 +12,7 @@ versions:
         severity: red
       - matcher_type: default
         severity: yellow
-  "2.0.0":
+  "1.2.0":
     released_at: 2026-01-22T10:30:00Z
     matchers:
       - matcher_type: location_hash

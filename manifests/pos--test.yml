@@ -15,7 +15,7 @@ versions:
       - matcher_type: country
         matcher_value: DE
         severity: red
-  "2.0.0":
+  "1.2.0":
     released_at: 2026-01-22T10:30:00Z
     matchers:
       - matcher_type: default
@@ -23,6 +23,38 @@ versions:
       - matcher_type: country
         matcher_value: NL
         severity: yellow
+      - matcher_type: location_hash
+        matcher_value: 9b6835f566cbbd84a554fbf0bd508893e68afc283c2367322d9d02b4c97868fa
+        severity: red
+  "1.9.1":
+    released_at: 2026-01-10T09:00:00Z
+    matchers:
+      - matcher_type: default
+        severity: green
+      - matcher_type: country
+        matcher_value: NL
+        severity: yellow
+      - matcher_type: location_hash
+        matcher_value: 9b6835f566cbbd84a554fbf0bd508893e68afc283c2367322d9d02b4c97868fa
+        severity: red
+  "1.9.2":
+    released_at: 2026-01-10T09:00:00Z
+    matchers:
+      - matcher_type: default
+        severity: red
+  "1.9.3":
+    released_at: 2026-01-10T09:00:00Z
+    matchers:
+      - matcher_type: default
+        severity: green
+      - matcher_type: country
+        matcher_value: NL
+        severity: yellow
+  "1.9.4":
+    released_at: 2026-01-10T09:00:00Z
+    matchers:
+      - matcher_type: default
+        severity: green
       - matcher_type: location_hash
         matcher_value: 9b6835f566cbbd84a554fbf0bd508893e68afc283c2367322d9d02b4c97868fa
         severity: red
