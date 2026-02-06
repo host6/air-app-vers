@@ -79,9 +79,12 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const headRef = context.payload.pull_request.head.ref;
+            const mergeMethod = headRef === 'main' ? 'merge' : 'squash';
+
             await github.rest.pulls.merge({
               owner: context.repo.owner,
               repo: context.repo.repo,
               pull_number: context.issue.number,
-              merge_method: 'merge'
+              merge_method: mergeMethod
             });
